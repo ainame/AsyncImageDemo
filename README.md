@@ -5,11 +5,11 @@ This was reported at FB13268157.
 
 # What's wrong with this?
 
-This app showcases `AsyncImage`'s loading is strangely cancelled. With the below simple `View` code (hidden under `Details`) just loading image or showing error as Red screen, 
-you can see that the 2nd item's loading had an error. On Xcode, I observed this was cancelled.  
+This app showcases `AsyncImage`'s loading is strangely cancelled. With the below simple `View` code (hidden under `Details`) just loading image or showing error as Red screen,
+you can see that the 2nd item's loading had an error. On Xcode, I observed this was cancelled.
 
 <details>
-  
+
 ```swift
 struct ItemView: View {
     let url: URL?
@@ -77,6 +77,54 @@ Error Domain=NSURLErrorDomain Code=-999 "cancelled" UserInfo={NSErrorFailingURLS
 # Environment to replicate
 
 Xcode 15.0 (15A240d) + iOS 17 simulator (iPhone 15 Pro Max) running on macOS 14.0 Sonoma (23A344)
+
+# Possible workaround
+
+The workaround I came up was to manage the result of loading in each view having `AsyncImage` and
+reset and assign back the remote image URL to `imageUrl` state property on every appear and disappear hook until succeeds.
+
+```swift
+struct ItemView: View {
+    let url: URL?
+
+    @State private var hasImageLoaded: Bool = false
+    @State private var imageUrl: URL? = nil
+
+    var body: some View {
+        AsyncImage(url: imageUrl) { phase in
+            switch phase {
+            case .empty:
+                ProgressView()
+            case .success(let image):
+                image
+                    .aspectRatio(contentMode: .fill)
+                    .containerRelativeFrame([.vertical, .horizontal])
+                    .clipped()
+                    .onAppear {
+                        hasImageLoaded = true
+                    }
+            case .failure(let error):
+                let _ = print(error)
+                Color.red
+                    .containerRelativeFrame([.vertical, .horizontal])
+                    .clipped()
+            @unknown default:
+                ProgressView()
+            }
+        }
+        .onAppear {
+            if !hasImageLoaded {
+                imageUrl = url
+            }
+        }
+        .onDisappear {
+            if !hasImageLoaded {
+                imageUrl = nil
+            }
+        }
+    }
+}
+```
 
 # Related links
 
