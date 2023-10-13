@@ -76,3 +76,7 @@ Error Domain=NSURLErrorDomain Code=-999 "cancelled" UserInfo={NSErrorFailingURLS
 # Environment to replicate
 
 Xcode 15.0 (15A240d) + iOS 17 simulator (iPhone 15 Pro Max) running on macOS 14.0 Sonoma (23A344)
+
+# Related links
+
+* https://developer.apple.com/forums/thread/682498
