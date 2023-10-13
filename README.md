@@ -1,6 +1,7 @@
 # AsyncImageDemo
 
-This repo shares strange behaviour of AsyncImage in ScrollView that 2nd item's image loading is immediately cancelled
+This repo shares strange behaviour of AsyncImage in ScrollView that 2nd item's image loading is immediately cancelled.
+This was reported at FB13268157.
 
 # What's wrong with this?
 
